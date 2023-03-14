@@ -7,12 +7,8 @@ const port = 3000;
 //app.use(bodyParser.urlencoded({extended:true}));
 //app.use(bodyParser.json());
 
-// const router = express.Router();
-app.get('/', (req, res) => res.json({message: 'Funcionando!'}));
-//app.use('/', router);
-
-//var clientsRouter = require('./routes/clients');
-//app.use('/clients', clientsRouter);
+var usersRoute = require('./src/routes/users.route');
+app.use('/users', usersRoute);
 
 
 app.listen(port);
