@@ -1,40 +1,12 @@
 const router = require('express').Router();
 const userController = require('../controllers/users.controllers');
+const {validId, validUser} = require('../middlewares/global.middlewares');
 
-router.get('/', async function(req,res,next){
-    try{
-        userController.list(req, res);
-    }catch(ex){
-        console.log(ex);
-        res.status(400).json({erro: `${ex}`});
-    }
-});
+router.get('/', (req,res) => userController.list(req, res));
+router.get('/:id', validId, validUser, (req,res) => userController.find(req, res));
+router.post('/', (req, res) => userController.create(req, res));
+router.patch('/:id', validId, validUser, (req, res) => userController.update(req, res));
+router.delete('/:id', validId, validUser, (req, res) => userController.remove(req, res));
 
-router.post('/', async function(req, res, next){
-    try{
-        userController.create(req, res);
-    }catch(ex){
-        console.log(ex);
-        res.status(400).json({erro: `${ex}`});
-    }
-});
-
-router.put('/', async function(req, res, next){
-    try{
-        //userController.create(req, res);
-    }catch(ex){
-        console.log(ex);
-        res.status(400).json({erro: `${ex}`});
-    }
-});
-
-router.delete('/', async function(req, res, next){
-    try{
-        //userController.create(req, res);
-    }catch(ex){
-        console.log(ex);
-        res.status(400).json({erro: `${ex}`});
-    }
-});
 
 module.exports = router;
