@@ -1,6 +1,9 @@
-const express = require('express');
+import express from 'express';
+import conn from './src/database/db.js';
+import usersRoute from './src/routes/users.route.js';
+
+
 const app = express();
-const conn = require('./src/database/db');
 // const bodyParser = require('body-parser');
 const port = 3000;
 
@@ -10,7 +13,7 @@ const port = 3000;
 conn();
 app.use(express.json());
 
-const usersRoute = require('./src/routes/users.route');
+
 app.use('/users', usersRoute);
 
 

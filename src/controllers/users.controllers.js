@@ -1,5 +1,4 @@
-const userService = require('../services/users.service');
-const mongoose = require('mongoose');
+import userService from '../services/users.service.js';
 
 const list = async (req, resp) => {
     try{
@@ -68,4 +67,4 @@ const remove = async (req, resp) => {
     }
 };
 
-module.exports = {list, find, create, update, remove};
+export default {list, find, create, update, remove};

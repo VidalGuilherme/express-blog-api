@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const conn = () => {
   mongoose
@@ -10,4 +10,4 @@ const conn = () => {
     .catch((error) => console.log(error));
 };
 
-module.exports = conn;
+export default conn;
