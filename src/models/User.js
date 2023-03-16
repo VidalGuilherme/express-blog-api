@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const UserSchema = new mongoose.Schema({
     name:{
@@ -16,7 +17,8 @@ const UserSchema = new mongoose.Schema({
     },
     password:{
         type: String,
-        required: true
+        required: true,
+        select: false
     },
     avatar:{
         type: String,
@@ -26,6 +28,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     }
+});
+
+UserSchema.pre("save", function(next){
+    this.password = bcrypt.hashSync(this.password, 10);
+    next();
+});
+
+UserSchema.pre("findOneAndUpdate", function(next){    
+    this._update.password = bcrypt.hashSync(this._update.password, 10);
+    next();
 });
 
 const User = mongoose.model("User", UserSchema);

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const conn = () => {
   mongoose
     .connect(
-      "mongodb+srv://azinovations:bGaYQGiaEqOj0NeL@azinovation.s6bqeg5.mongodb.net/?retryWrites=true&w=majority",
+      process.env.MONGODB_URI,
       { useNewUrlParser: true, useUnifiedTopology: true }
     )
     .then(() => console.log("MongoDb Atlas Conectado com Sucesso!"))
