@@ -3,8 +3,9 @@ import conn from './src/database/db.js';
 import dotenv from 'dotenv';
 
 
-import usersRoute from './src/routes/users.route.js';
 import authRoute from './src/routes/auth.route.js';
+import usersRoute from './src/routes/users.route.js';
+import newsRoute from './src/routes/news.route.js';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ conn();
 app.use(express.json());
 app.use('/users', usersRoute);
 app.use('/auth', authRoute);
+app.use('/news', newsRoute);
 
 
 app.listen(port, () => console.log(`Servidor rodando na porta ${port}`));
