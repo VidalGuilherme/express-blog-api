@@ -1,4 +1,4 @@
-import newsService, {commentNews} from '../services/news.service.js';
+import newsService, {newsComment} from '../../services/news.service.js';
 
 const list = async (req, resp) => {
     try{
@@ -11,8 +11,32 @@ const list = async (req, resp) => {
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;
 
-        const list = await newsService.list(page, limit, filters);
-        return resp.json(list);
+        const news = await newsService.list(page, limit, filters);
+        const total = await newsService.total();
+        const pagesTotal = total/limit;
+        const next = page < pagesTotal ? page + 1 : null;
+        const previous = page > 1 ? page - 1 : 1;
+
+        return resp.json({
+            total,
+            currentPage: page,            
+            next,
+            previous,
+            news: news.map((item) => ({
+                id: item._id,
+                title: item.title,
+                text: item.text,
+                banner: item.banner,
+                createdAt: item.createdAt,
+                likes: item.likes,
+                comments: item.comments,
+                user: {
+                    name: item.user.name,
+                    usermame: item.user.username,
+                    avatar: item.user.avatar,
+                }
+            }))
+        }); 
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
     }
@@ -35,7 +59,9 @@ const create = async (req, resp) => {
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create(title, text, banner, req.userId);
+        const news = await newsService.create({
+            title, text, banner, user:{_id:req.userId}
+        });
 
         if(!news){
             return resp.status(400).send({message: "Erro ao tentar criar notícia."});
@@ -89,7 +115,7 @@ const likeAndDeslike = async (req, resp) => {
             await newsService.deslike(id, userId);
             return resp.status(200).send({message: "desliked!"});
         }
-
+        
         return resp.status(200).send({message: "liked!"});
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -103,7 +129,7 @@ const comment = async (req, resp) => {
             userId = req.userId,
             {comment} = req.body;
 
-        await commentNews(id, userId, comment);
+        await newsComment(id, userId, comment);
         
         return resp.status(200).send({message: "Comentado com Sucesso!"});
     }catch(ex){

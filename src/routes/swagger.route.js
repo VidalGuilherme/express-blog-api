@@ -6,7 +6,7 @@ const router = Router();
 
 const swaggerOptions = {
     swaggerDefinition: swaggerDocument,
-    apis: ['./src/routes/*.js']
+    apis: ['./src/swagger/*.js']
 }
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

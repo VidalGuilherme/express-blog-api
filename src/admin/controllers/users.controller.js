@@ -1,4 +1,4 @@
-import userService from '../services/users.service.js';
+import userService from '../../services/users.service.js';
 
 const list = async (req, resp) => {
     try{
@@ -26,7 +26,7 @@ const create = async (req, resp) => {
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const user = await userService.create(name, username, password, email, avatar, background);
+        const user = await userService.create(req.body);
         if(!user){
             return resp.status(400).send({message: "Erro ao tentar criar usuário."});
         }

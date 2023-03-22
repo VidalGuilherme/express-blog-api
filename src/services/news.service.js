@@ -1,43 +1,86 @@
-import New from '../models/New.js';
+import newsRepositorie, {newsComment} from '../repositories/news.repositorie.js';
 
-const create = (body) => New.create(body);
+const list = async (page, limit, filters) => {
+    const news = await newsRepositorie.list(page, limit, filters);
+    const total = await newsRepositorie.total();
+    const pagesTotal = total/limit;
+    const next = page < pagesTotal ? page + 1 : null;
+    const previous = page > 1 ? page - 1 : 1;
 
-const list = (offset, limit, filters) => New.find(filters).sort({_id:-1}).skip((offset-1) * limit).limit(limit).populate('user');
-
-const find = (id) => New.findById(id).populate('user');
-
-const update = (id, title, banner) => New.findOneAndUpdate({_id:id}, {id, title, banner});
-
-const remove = (id) => New.findOneAndRemove({_id:id});
-
-const total = () => New.countDocuments();
-
-const last = () => New.findOne().sort({_id:-1}).populate('user');
-
-const like = (id, userId) => New.findOneAndUpdate(
-    { _id: id, 'likes.userId': { $nin: [userId] } },
-    { $push: { likes: {userId, createdAt: new Date()} } }
-);
-
-const deslike = (id, userId) => New.findOneAndUpdate(
-    { _id: id},
-    { $pull: { likes: {userId} } }
-);
-
-const newsComment = (id, userId, comment) => { 
-    const idComment = Math.floor(Date.now() * Math.random()).toString(36);
-    return New.findOneAndUpdate(
-        { _id: id },
-        { $push: { comments: {_id: idComment, userId, comment, createdAt: new Date()} } }
-    );
+    return {
+        total,
+        currentPage: page,            
+        next,
+        previous,
+        news: news.map((item) => ({
+            id: item._id,
+            title: item.title,
+            text: item.text,
+            banner: item.banner,
+            createdAt: item.createdAt,
+            likes: item.likes,
+            comments: item.comments,
+            user: {
+                name: item.user.name,
+                usermame: item.user.username,
+                avatar: item.user.avatar,
+            }
+        }))
+    };
 };
 
-const uncomment = (id, userId, commentId) => New.findOneAndUpdate(
-    { _id: id },
-    { $pull: { comments: {_id: commentId, userId} } }
-);
+const find = async (id) => {
+    const news = await newsRepositorie.find(id);
+    return resp.json(news);
+};
+
+const create = async (title, text, banner, userId) => {
+    const news = await newsRepositorie.create({
+        title, text, banner, user:{_id:userId}
+    });
+    return news;
+};
+
+const update = async (id, title, text, banner) => {
+    await newsRepositorie.update(id, title, text, banner);
+    return true;
+};
+
+const remove = async (id) => {
+    await newsRepositorie.remove(id);
+    return true;
+};
+
+const like = async (id, userId) => {
+    const liked = await newsRepositorie.like(id, userId);
+    return liked;
+};
+
+const deslike = async (id, userId) => {
+    await newsRepositorie.deslike(id, userId);
+};
+
+const commentNews = async (id, userId, comment) => {
+    await newsComment(id, userId, comment);
+    return true;
+};
+
+const uncomment = async (id, userId, commentId) => {
+    const news = await newsRepositorie.uncomment(id, userId, commentId);
+    const uncomment = news.comments.find((comment) => comment._id === commentId );
+    return uncomment;
+};
+
+const total = async () => {
+    return newsRepositorie.total();
+};
+
+const last = async () => {
+    return newsRepositorie.last();
+};
 
 export default {
-    create, list, find, update, remove, total, last, like, deslike, uncomment
+    list, find, create, update, remove, total, last, like, deslike, uncomment
 };
-export {newsComment}
+
+export {commentNews}
