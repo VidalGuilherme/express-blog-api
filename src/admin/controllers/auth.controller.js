@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import {findByEmailWithPass} from '../../services/users.service.js';
+import {findUserByEmailWithPass} from '../../services/users.service.js';
 import {generateTokenAdmin} from '../../services/auth.service.js';
 
 const login = async (req, resp) => {
@@ -10,7 +10,7 @@ const login = async (req, resp) => {
             return resp.status(400).json({message: "Preencha os campos email e senha!"});
         }
 
-        const user = await findByEmailWithPass(email);
+        const user = await findUserByEmailWithPass(email);
         const passwordIsValid = user ? await bcrypt.compare(password, user.password) : false; 
 
         if(!passwordIsValid || !user){

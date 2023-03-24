@@ -1,42 +1,31 @@
-import newsService, {newsComment} from '../../services/news.service.js';
+import newsService, {commentNews} from '../../services/news.service.js';
 
 const list = async (req, resp) => {
     try{
-        let {page, limit} = req.query;
+        let {_end, _start, _order, _sort} = req.query;
         const {title, userId} = req.query;
         const filterTitle = title ? { title: { $regex: `${title}`, $options: "i" } } : {};
         const filterUser = userId ? { user: userId} : {};
         const filters = Object.assign(filterTitle, filterUser);
 
-        page = page ? Number(page) : 1;
-        limit = limit ? Number(limit) : 5;
+        const news = await newsService.list(_start, _end, filters); 
+        const data = news.data.map((item) => ({
+            id: item._id,
+            title: item.title,
+            text: item.text,
+            banner: item.banner,
+            user: {
+                id: item.user._id,
+                name: item.user.name,
+            },
+            createdAt: item.createdAt,
+            counLikes: item.likes.length,
+            countComments: item.comments.length,
+        }));
 
-        const news = await newsService.list(page, limit, filters);
-        const total = await newsService.total();
-        const pagesTotal = total/limit;
-        const next = page < pagesTotal ? page + 1 : null;
-        const previous = page > 1 ? page - 1 : 1;
-
-        return resp.json({
-            total,
-            currentPage: page,            
-            next,
-            previous,
-            news: news.map((item) => ({
-                id: item._id,
-                title: item.title,
-                text: item.text,
-                banner: item.banner,
-                createdAt: item.createdAt,
-                likes: item.likes,
-                comments: item.comments,
-                user: {
-                    name: item.user.name,
-                    usermame: item.user.username,
-                    avatar: item.user.avatar,
-                }
-            }))
-        }); 
+        resp.set('Access-Control-Expose-Headers', 'X-Total-Count');
+        resp.set('X-Total-Count', news.total);
+        return resp.json(data);
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
     }
@@ -59,9 +48,7 @@ const create = async (req, resp) => {
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create({
-            title, text, banner, user:{_id:req.userId}
-        });
+        const news = await newsService.create(title, text, banner, req.userId);
 
         if(!news){
             return resp.status(400).send({message: "Erro ao tentar criar notícia."});
@@ -115,7 +102,7 @@ const likeAndDeslike = async (req, resp) => {
             await newsService.deslike(id, userId);
             return resp.status(200).send({message: "desliked!"});
         }
-        
+
         return resp.status(200).send({message: "liked!"});
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -129,7 +116,7 @@ const comment = async (req, resp) => {
             userId = req.userId,
             {comment} = req.body;
 
-        await newsComment(id, userId, comment);
+        await commentNews(id, userId, comment);
         
         return resp.status(200).send({message: "Comentado com Sucesso!"});
     }catch(ex){

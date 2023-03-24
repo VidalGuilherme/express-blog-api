@@ -10,8 +10,35 @@ const list = async (req, resp) => {
 
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;
+        const offset = (page-1) * limit;
 
-        const list = await newsService.list(page, limit, filters);
+        const news = await newsService.list(offset, limit, filters);
+        const pagesTotal = news.total/limit;
+        const next = page < pagesTotal ? page + 1 : null;
+        const previous = page > 1 ? page - 1 : 1;
+
+        const list = {
+            total: news.total,
+            currentPage: page,            
+            next,
+            previous,
+            news: news.data.map((item) => ({
+                id: item._id,
+                title: item.title,
+                text: item.text,
+                banner: item.banner,
+                createdAt: item.createdAt,
+                likes: item.likes,
+                comments: item.comments,
+                user: {
+                    id: item.user._id,
+                    name: item.user.name,
+                    usermame: item.user.username,
+                    avatar: item.user.avatar,
+                }
+            }))
+        };
+
         return resp.json(list);
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});

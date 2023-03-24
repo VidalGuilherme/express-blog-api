@@ -1,31 +1,11 @@
 import newsRepositorie, {newsComment} from '../repositories/news.repositorie.js';
 
-const list = async (page, limit, filters) => {
-    const news = await newsRepositorie.list(page, limit, filters);
+const list = async (offset, limit, filters) => {
+    const news = await newsRepositorie.list(offset, limit, filters);
     const total = await newsRepositorie.total();
-    const pagesTotal = total/limit;
-    const next = page < pagesTotal ? page + 1 : null;
-    const previous = page > 1 ? page - 1 : 1;
-
     return {
-        total,
-        currentPage: page,            
-        next,
-        previous,
-        news: news.map((item) => ({
-            id: item._id,
-            title: item.title,
-            text: item.text,
-            banner: item.banner,
-            createdAt: item.createdAt,
-            likes: item.likes,
-            comments: item.comments,
-            user: {
-                name: item.user.name,
-                usermame: item.user.username,
-                avatar: item.user.avatar,
-            }
-        }))
+        total: total,
+        data: news
     };
 };
 

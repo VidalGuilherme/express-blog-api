@@ -2,7 +2,7 @@ import New from '../models/New.js';
 
 const create = (body) => New.create(body);
 
-const list = (offset, limit, filters) => New.find(filters).sort({_id:-1}).skip((offset-1) * limit).limit(limit).populate('user');
+const list = (offset, limit, filters) => New.find(filters).sort({_id:-1}).skip(offset).limit(limit).populate('user');
 
 const find = (id) => New.findById(id).populate('user');
 
