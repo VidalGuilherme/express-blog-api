@@ -6,7 +6,7 @@ const list = async () => {
 };
 
 const find = async (id) => {
-    const user = userRepositorie.find(id);
+    const user = await userRepositorie.find(id);
     return user;
 };
 

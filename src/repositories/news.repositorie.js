@@ -6,11 +6,13 @@ const list = (offset, limit, filters) => New.find(filters).sort({_id:-1}).skip(o
 
 const find = (id) => New.findById(id).populate('user');
 
-const update = (id, title, banner) => New.findOneAndUpdate({_id:id}, {id, title, banner});
+const findBySlug = (category, slug) => New.findOne({slug: slug}).populate('user');
+
+const update = (id, title, slug, text, banner) => New.findOneAndUpdate({_id:id}, {id, title, slug, text, banner});
 
 const remove = (id) => New.findOneAndRemove({_id:id});
 
-const total = () => New.countDocuments();
+const total = (filters) => New.countDocuments(filters);
 
 const last = () => New.findOne().sort({_id:-1}).populate('user');
 
@@ -38,7 +40,7 @@ const uncomment = (id, userId, commentId) => New.findOneAndUpdate(
 );
 
 export default {
-    create, list, find, update, remove, total, last, like, deslike, uncomment
+    create, list, find, findBySlug, update, remove, total, last, like, deslike, uncomment
 };
 
 export {newsComment}

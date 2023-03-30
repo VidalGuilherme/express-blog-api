@@ -15,15 +15,19 @@ const list = async (req, resp) => {
         const news = await newsService.list(offset, limit, filters);
         const pagesTotal = news.total/limit;
         const next = page < pagesTotal ? page + 1 : null;
-        const previous = page > 1 ? page - 1 : 1;
+        const previous = page > 1 ? page - 1 : null;
 
         const list = {
-            total: news.total,
-            currentPage: page,            
-            next,
-            previous,
+            pagination: {
+                total: news.total,
+                currentPage: page,            
+                next,
+                previous,
+            },
             news: news.data.map((item) => ({
                 id: item._id,
+                slug: item.slug,
+                category: 'games',
                 title: item.title,
                 text: item.text,
                 banner: item.banner,
@@ -54,15 +58,25 @@ const find = async (req, resp) => {
     }
 };
 
+const findBySlug = async (req, resp) => {
+    try{
+        const {category, slug} = req.params;
+        const news = await newsService.findBySlug(category, slug);
+        return resp.json({news});
+    }catch(ex){
+        return resp.status(500).json({erro: `${ex}`});
+    }
+};
+
 const create = async (req, resp) => {
     try{
-        const {title, text, banner} = req.body;
+        const {title, text, banner, category} = req.body;
 
-        if(!title || !text || !banner){
+        if(!title || !text || !banner || !category){
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create(title, text, banner, req.userId);
+        const news = await newsService.create(title, text, banner, category, req.userId);
 
         if(!news){
             return resp.status(400).send({message: "Erro ao tentar criar notícia."});
@@ -79,7 +93,7 @@ const create = async (req, resp) => {
 
 const update = async (req, resp) => {
     try{
-        const {title, text, banner} = req.body;
+        const {title, banner, text} = req.body;
 
         if(!title && !text && !banner){
             return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
@@ -161,4 +175,4 @@ const uncomment = async (req, resp) => {
     }
 };
 
-export default {list, find, create, update, remove, likeAndDeslike, comment, uncomment};
+export default {list, find, findBySlug, create, update, remove, likeAndDeslike, comment, uncomment};

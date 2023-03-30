@@ -5,10 +5,10 @@ import {validAuthAdmin} from '../middlewares/auth.middlewares.js';
 
 const router = express.Router();
 
-router.get('/', (req,res) => userController.list(req, res));
+router.get('/', validAuthAdmin, (req,res) => userController.list(req, res));
 router.get('/:id', validAuthAdmin, validId, validUser, (req,res) => userController.find(req, res));
 router.post('/', validAuthAdmin, (req, res) => userController.create(req, res));
 router.patch('/:id', validAuthAdmin, validId, validUser, (req, res) => userController.update(req, res));
-router.delete('/:id',validAuthAdmin, validId, validUser, (req, res) => userController.remove(req, res));
+router.delete('/:id', validAuthAdmin, validId, validUser, (req, res) => userController.remove(req, res));
 
 export default router;

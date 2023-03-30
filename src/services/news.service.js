@@ -1,8 +1,9 @@
 import newsRepositorie, {newsComment} from '../repositories/news.repositorie.js';
+import { stringToSlug } from '../middlewares/global.middlewares.js';
 
 const list = async (offset, limit, filters) => {
     const news = await newsRepositorie.list(offset, limit, filters);
-    const total = await newsRepositorie.total();
+    const total = await newsRepositorie.total(filters);
     return {
         total: total,
         data: news
@@ -11,18 +12,25 @@ const list = async (offset, limit, filters) => {
 
 const find = async (id) => {
     const news = await newsRepositorie.find(id);
-    return resp.json(news);
+    return news;
 };
 
-const create = async (title, text, banner, userId) => {
+const findBySlug = async (category, slug) => {    
+    const news = await newsRepositorie.findBySlug(category, slug);
+    return news;
+};
+
+const create = async (title, text, banner, category, userId) => {
+    const slug = stringToSlug(title);
     const news = await newsRepositorie.create({
-        title, text, banner, user:{_id:userId}
+        title, slug, text, banner, category, user:{_id:userId}
     });
     return news;
 };
 
 const update = async (id, title, text, banner) => {
-    await newsRepositorie.update(id, title, text, banner);
+    const slug = stringToSlug(title);
+    await newsRepositorie.update(id, title, slug, text, banner);
     return true;
 };
 
@@ -51,8 +59,8 @@ const uncomment = async (id, userId, commentId) => {
     return uncomment;
 };
 
-const total = async () => {
-    return newsRepositorie.total();
+const total = async (filters) => {
+    return newsRepositorie.total(filters);
 };
 
 const last = async () => {
@@ -60,7 +68,7 @@ const last = async () => {
 };
 
 export default {
-    list, find, create, update, remove, total, last, like, deslike, uncomment
+    list, find, findBySlug, create, update, remove, total, last, like, deslike, uncomment
 };
 
 export {commentNews}
