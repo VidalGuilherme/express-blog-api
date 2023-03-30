@@ -2,7 +2,7 @@ import express from 'express';
 import conn from './src/database/db.js';
 import dotenv from 'dotenv';
 
-import swaggerRoute from './src/routes/swagger.route.js';
+import swaggerRoute from './src/routes/swagger.route.cjs';
 
 import authRoute from './src/routes/auth.route.js';
 //import usersRoute from './src/routes/users.route.js';

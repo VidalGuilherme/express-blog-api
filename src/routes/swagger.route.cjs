@@ -1,8 +1,7 @@
-import swaggerUi from "swagger-ui-express";
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerDocument from "../swagger.json" assert {type: "json"};
-import {Router} from 'express';
-const router = Router();
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerDocument = require("../swagger.json");
+const router = require('express').Router();
 
 const swaggerOptions = {
     swaggerDefinition: swaggerDocument,
@@ -14,4 +13,4 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 router.use("/", swaggerUi.serve);
 router.get("/", swaggerUi.setup(swaggerDocs));
 
-export default router;
+module.exports = router;
