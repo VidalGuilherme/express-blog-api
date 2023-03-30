@@ -1,7 +1,7 @@
 {
-  "name": "apibreaknews",
+  "name": "apitabgames",
   "version": "1.0.0",
-  "description": "API for breaking news",
+  "description": "API for tabgames",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "dev": "nodemon index"
   },
   "keywords": [],
-  "author": "Vidal",
+  "author": "AzInovations",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",

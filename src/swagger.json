@@ -1,12 +1,16 @@
 {
     "info": {
-        "title" : "Test",
-        "description" : "Desc",
+        "title" : "Api TabGames",
+        "description" : "Api for TabGames",
         "contact": {
-            "email": "email@mail.com"
+            "email": "azinovations@gmail.com"
         },
         "version" : "1.0.0",
         "servers": [
+            {
+                "url":"http://localhost:3000",
+                "description":"Local"
+            },
             {
                 "url":"http://localhost:3000",
                 "description":"Local"
