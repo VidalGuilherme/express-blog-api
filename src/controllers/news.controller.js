@@ -1,4 +1,4 @@
-import newsService, {commentNews} from '../services/news.service.js';
+import newsService, {commentNews, formatNews} from '../services/news.service.js';
 
 const list = async (req, resp) => {
     try{
@@ -16,7 +16,7 @@ const list = async (req, resp) => {
         const pagesTotal = news.total/limit;
         const next = page < pagesTotal ? page + 1 : null;
         const previous = page > 1 ? page - 1 : null;
-
+        
         const list = {
             pagination: {
                 total: news.total,
@@ -24,23 +24,7 @@ const list = async (req, resp) => {
                 next,
                 previous,
             },
-            news: news.data.map((item) => ({
-                id: item._id,
-                slug: item.slug,
-                category: 'games',
-                title: item.title,
-                text: item.text,
-                banner: item.banner,
-                createdAt: item.createdAt,
-                likes: item.likes,
-                comments: item.comments,
-                user: {
-                    id: item.user._id,
-                    name: item.user.name,
-                    usermame: item.user.username,
-                    avatar: item.user.avatar,
-                }
-            }))
+            news: news.data.map((item) => formatNews(item))
         };
 
         return resp.json(list);
@@ -49,19 +33,10 @@ const list = async (req, resp) => {
     }
 };
 
-const find = async (req, resp) => {
-    try{
-        const news = req.news;
-        return resp.json(news);
-    }catch(ex){
-        return resp.status(500).json({erro: `${ex}`});
-    }
-};
-
 const findBySlug = async (req, resp) => {
     try{
         const {category, slug} = req.params;
-        const news = await newsService.findBySlug(category, slug);
+        const news = formatNews(await newsService.findBySlug(category, slug));
         return resp.json({news});
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -111,16 +86,15 @@ const uncomment = async (req, resp) => {
             commentId = req.params.idComment,
             userId = req.userId;
 
-        const news = await newsService.uncomment(id, userId, commentId);
-        const uncomment = news.comments.find((comment) => comment._id === commentId );
+        const uncomment = await newsService.uncomment(id, userId, commentId);        
 
         if(!uncomment){
             return resp.status(404).send({message: "Comentário não encontrado"});
         }
 
-        if(uncomment.userId !== userId){
-            return resp.status(401).send({message: "Não autorizado"});
-        }
+        // if(uncomment.userId !== userId){
+        //     return resp.status(401).send({message: "Não autorizado"});
+        // }
 
         return resp.status(200).send({message: "Comentário removido com Sucesso!"});
     }catch(ex){
@@ -128,4 +102,4 @@ const uncomment = async (req, resp) => {
     }
 };
 
-export default {list, find, findBySlug, likeAndDeslike, comment, uncomment};
+export default {list, findBySlug, likeAndDeslike, comment, uncomment};

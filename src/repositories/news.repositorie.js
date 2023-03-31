@@ -6,9 +6,9 @@ const list = (offset, limit, filters) => New.find(filters).sort({_id:-1}).skip(o
 
 const find = (id) => New.findById(id).populate('user');
 
-const findBySlug = (category, slug) => New.findOne({slug: slug}).populate('user');
+const findBySlug = (category, slug) => New.findOne({slug: slug, category: category}).populate('user');
 
-const update = (id, title, slug, text, banner) => New.findOneAndUpdate({_id:id}, {id, title, slug, text, banner});
+const update = (id, body) => New.findOneAndUpdate({_id:id}, body);
 
 const remove = (id) => New.findOneAndRemove({_id:id});
 
@@ -35,7 +35,7 @@ const newsComment = (id, userId, readerId, commentId, comment, name, email) => {
 
 const uncomment = (id, userId, commentId) => New.findOneAndUpdate(
     { _id: id },
-    { $pull: { comments: {_id: commentId, userId} } }
+    { $pull: { comments: {_id: commentId} } }
 );
 
 export default {

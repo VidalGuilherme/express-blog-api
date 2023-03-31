@@ -11,16 +11,20 @@ const list = async (req, resp) => {
         const news = await newsService.list(_start, _end, filters); 
         const data = news.data.map((item) => ({
             id: item._id,
+            slug: item.slug,
+            category: item.category,
             title: item.title,
             text: item.text,
             banner: item.banner,
-            user: {
+            createdAt: item.createdAt,
+            likes: item.likes,
+            comments: item.comments,
+            user: item.user ? {
                 id: item.user._id,
                 name: item.user.name,
-            },
-            createdAt: item.createdAt,
-            counLikes: item.likes.length,
-            countComments: item.comments.length,
+                usermame: item.user.username,
+                avatar: item.user.avatar,
+            } : {}
         }));
 
         resp.set('Access-Control-Expose-Headers', 'X-Total-Count');
@@ -42,13 +46,13 @@ const find = async (req, resp) => {
 
 const create = async (req, resp) => {
     try{
-        const {title, text, banner} = req.body;
+        const {title, text, banner, category} = req.body;
 
-        if(!title || !text || !banner){
+        if(!title || !text || !banner || !category){
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create(title, text, banner, req.userId);
+        const news = await newsService.create(title, text, banner, category, req.userId);
 
         if(!news){
             return resp.status(400).send({message: "Erro ao tentar criar notícia."});
@@ -65,14 +69,14 @@ const create = async (req, resp) => {
 
 const update = async (req, resp) => {
     try{
-        const {title, text, banner} = req.body;
+        const {title, text, banner, category} = req.body;
 
-        if(!title && !text && !banner){
+        if(!title && !text && !banner && !category){
             return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
         }
 
         const {id, news} = req;
-        await newsService.update(id, title, text, banner);
+        await newsService.update(id, title, text, banner, category);
 
         return resp.status(200).send({message: "Notícia atualizada com sucesso!"});
     }catch(ex){

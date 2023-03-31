@@ -38,16 +38,15 @@ const commentReader = async (email, name, comment) => {
     let reader = await findByEmail(email);
     if(!reader)
         reader = await create(name, email);
-    const commentId = await readerComment(reader._id, comment);
-
-    return {readerId: reader._id, commentId: commentId};
+    const commentId = await readerComment(reader.id, comment);
+    return {readerId: reader.id, commentId: commentId};
 };
 
 const messageReader = async (email, name, message) => {
     let reader = await findByEmail(email);
     if(!reader)
-        reader = await create(name, email);
-    await readerMessage(reader._id, message);
+        reader = await create(name, email);        
+    await readerMessage(reader.id, message);
     return true;
 };
 

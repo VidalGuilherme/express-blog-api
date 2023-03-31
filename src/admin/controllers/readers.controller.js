@@ -1,4 +1,4 @@
-import readersService, {messageReader} from '../../services/readers.service.js';
+import readersService from '../../services/readers.service.js';
 
 const list = async (req, resp) => {
     try{
@@ -63,7 +63,7 @@ const create = async (req, resp) => {
         }
 
         return resp.status(201).send({
-            readers: {id: readers._id, title},
+            readers: {id: readers._id, name},
             message: "Reader criado com sucesso!"
         });
     }catch(ex){

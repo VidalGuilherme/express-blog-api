@@ -31,12 +31,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.pre("save", function(next){
+    console.log('save');
     this.password = bcrypt.hashSync(this.password, 10);
     next();
 });
 
-UserSchema.pre("findOneAndUpdate", function(next){    
-    this._update.password = bcrypt.hashSync(this._update.password, 10);
+UserSchema.pre("findOneAndUpdate", function(next){
+    if(this._update.password)
+        this._update.password = bcrypt.hashSync(this._update.password, 10);
     next();
 });
 

@@ -30,9 +30,9 @@ const create = async (title, text, banner, category, userId) => {
     return news;
 };
 
-const update = async (id, title, text, banner) => {
-    const slug = stringToSlug(title);
-    await newsRepositorie.update(id, title, slug, text, banner);
+const update = async (id, title, text, banner, category) => {
+    const slug = title ? stringToSlug(title) : undefined;
+    await newsRepositorie.update(id, {title, slug, text, banner, category});
     return true;
 };
 
@@ -70,8 +70,30 @@ const last = async () => {
     return newsRepositorie.last();
 };
 
+const formatNews = (item) => {
+    return {
+        id: item._id,
+        slug: item.slug,
+        category: item.category,
+        title: item.title,
+        text: item.text,
+        banner: item.banner,
+        createdAt: item.createdAt,
+        comments: item.comments.map((com) => ({
+            id: com._id,
+            name: com.name,
+            comment: com.comment,
+            createdAt: com.createdAt
+        })),
+        user: item.user ? {
+            name: item.user.name,
+            usermame: item.user.username,
+        } : {}
+    };
+}
+
 export default {
     list, find, findBySlug, create, update, remove, total, last, like, deslike, uncomment
 };
 
-export {commentNews}
+export {commentNews, formatNews}

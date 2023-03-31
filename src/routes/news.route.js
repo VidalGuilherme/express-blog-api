@@ -10,6 +10,6 @@ router.get('/', validAuth, (req,res) => newsController.list(req, res));
 router.get('/:category/:slug', validAuth, (req,res) => newsController.findBySlug(req, res));
 //router.patch('/like/:id', validAuth, validId, validNews, (req, res) => newsController.likeAndDeslike(req, res));
 router.patch('/comment/:id', validAuth, validId, validNews, (req, res) => newsController.comment(req, res));
-//router.patch('/uncomment/:id/:idComment', validAuth, validId, validNews, (req, res) => newsController.uncomment(req, res));
+router.patch('/uncomment/:id/:idComment', validAuth, validId, validNews, (req, res) => newsController.uncomment(req, res));
 
 export default router;
