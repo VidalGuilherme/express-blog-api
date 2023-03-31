@@ -68,56 +68,6 @@ const findBySlug = async (req, resp) => {
     }
 };
 
-const create = async (req, resp) => {
-    try{
-        const {title, text, banner, category} = req.body;
-
-        if(!title || !text || !banner || !category){
-            return resp.status(400).send({message: "Preencha todos os campos para o registro."});
-        }
-
-        const news = await newsService.create(title, text, banner, category, req.userId);
-
-        if(!news){
-            return resp.status(400).send({message: "Erro ao tentar criar notícia."});
-        }
-
-        return resp.status(201).send({
-            news: {id: news._id, title},
-            message: "Notícia criada com sucesso!"
-        });
-    }catch(ex){
-        return resp.status(500).json({erro: `${ex}`});
-    }
-};
-
-const update = async (req, resp) => {
-    try{
-        const {title, banner, text} = req.body;
-
-        if(!title && !text && !banner){
-            return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
-        }
-
-        const {id, news} = req;
-        await newsService.update(id, title, text, banner);
-
-        return resp.status(200).send({message: "Notícia atualizada com sucesso!"});
-    }catch(ex){
-        return resp.status(500).json({erro: `${ex}`});
-    }
-};
-
-const remove = async (req, resp) => {
-    try{
-        const id = req.id;
-        await newsService.remove(id);
-        return resp.status(200).send({message: "Notícia removida com sucesso!"});
-    }catch(ex){
-        return resp.status(500).json({erro: `${ex}`});
-    }
-};
-
 const likeAndDeslike = async (req, resp) => {
     try{
         const id = req.id,
@@ -140,11 +90,14 @@ const likeAndDeslike = async (req, resp) => {
 const comment = async (req, resp) => {
     try{
         const id = req.id,
-            news = req.news,
             userId = req.userId,
-            {comment} = req.body;
+            {comment, name, email} = req.body;
 
-        await commentNews(id, userId, comment);
+        if(!name || !email || !comment){
+            return resp.status(400).send({message: "Preencha todos os campos para o comentar."});
+        }
+
+        await commentNews(id, userId, comment, name, email);
         
         return resp.status(200).send({message: "Comentado com Sucesso!"});
     }catch(ex){
@@ -175,4 +128,4 @@ const uncomment = async (req, resp) => {
     }
 };
 
-export default {list, find, findBySlug, create, update, remove, likeAndDeslike, comment, uncomment};
+export default {list, find, findBySlug, likeAndDeslike, comment, uncomment};

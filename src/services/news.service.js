@@ -1,5 +1,7 @@
 import newsRepositorie, {newsComment} from '../repositories/news.repositorie.js';
 import { stringToSlug } from '../middlewares/global.middlewares.js';
+import { readerComment } from '../repositories/readers.repositorie.js';
+import { commentReader } from './readers.service.js';
 
 const list = async (offset, limit, filters) => {
     const news = await newsRepositorie.list(offset, limit, filters);
@@ -48,8 +50,9 @@ const deslike = async (id, userId) => {
     await newsRepositorie.deslike(id, userId);
 };
 
-const commentNews = async (id, userId, comment) => {
-    await newsComment(id, userId, comment);
+const commentNews = async (id, userId, comment, name, email) => {
+    const { readerId, commentId } = await commentReader(email, name, comment);
+    const newComment = await newsComment(id, userId, readerId, commentId, comment, name, email);
     return true;
 };
 

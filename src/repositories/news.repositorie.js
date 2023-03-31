@@ -26,11 +26,10 @@ const deslike = (id, userId) => New.findOneAndUpdate(
     { $pull: { likes: {userId} } }
 );
 
-const newsComment = (id, userId, comment) => { 
-    const idComment = Math.floor(Date.now() * Math.random()).toString(36);
+const newsComment = (id, userId, readerId, commentId, comment, name, email) => {     
     return New.findOneAndUpdate(
         { _id: id },
-        { $push: { comments: {_id: idComment, userId, comment, createdAt: new Date()} } }
+        { $push: { comments: {_id: commentId, userId, readerId, name, email, comment, createdAt: new Date()} } }
     );
 };
 

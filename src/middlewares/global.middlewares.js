@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import userService from '../services/users.service.js';
 import newsService from '../services/news.service.js';
+import readersService from '../services/readers.service.js';
 
 const validId = (req, resp, next) => {
     try{
@@ -45,6 +46,21 @@ const validNews = async (req, resp, next) => {
     }
 };
 
+const validReaders = async (req, resp, next) => {
+    try{
+        const id = req.params.id;
+        const reader = await readersService.find(id);
+        if(!reader){
+            return resp.status(400).send({message: "Reader não encontrado."});
+        }
+        req.id = id;
+        req.reader = reader;
+        next();
+    }catch(ex){
+        return resp.status(500).json({erro: `${ex}`});
+    }
+};
+
 const stringToSlug = (str) => {
     str = str.replace(/^\s+|\s+$/g, ''); // trim
     str = str.toLowerCase();
@@ -63,4 +79,4 @@ const stringToSlug = (str) => {
     return str;
 };
 
-export {validId, validUser, validNews, stringToSlug};
+export {validId, validUser, validNews, validReaders, stringToSlug};
