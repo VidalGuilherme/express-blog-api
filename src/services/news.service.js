@@ -3,8 +3,8 @@ import { stringToSlug } from '../middlewares/global.middlewares.js';
 import { readerComment } from '../repositories/readers.repositorie.js';
 import { commentReader } from './readers.service.js';
 
-const list = async (offset, limit, filters) => {
-    const news = await newsRepositorie.list(offset, limit, filters);
+const list = async (offset, limit, sort, filters) => {
+    const news = await newsRepositorie.list(offset, limit, sort, filters);
     const total = await newsRepositorie.total(filters);
     return {
         total: total,

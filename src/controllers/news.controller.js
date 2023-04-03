@@ -2,7 +2,7 @@ import newsService, {commentNews, formatNews} from '../services/news.service.js'
 
 const list = async (req, resp) => {
     try{
-        let {page, limit} = req.query;
+        let {page, limit, sort, off} = req.query;
         const {title, userId} = req.query;
         const filterTitle = title ? { title: { $regex: `${title}`, $options: "i" } } : {};
         const filterUser = userId ? { user: userId} : {};
@@ -10,9 +10,9 @@ const list = async (req, resp) => {
 
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;
-        const offset = (page-1) * limit;
+        const offset = off || (page-1) * limit;
 
-        const news = await newsService.list(offset, limit, filters);
+        const news = await newsService.list(offset, limit, sort || -1, filters);
         const pagesTotal = news.total/limit;
         const next = page < pagesTotal ? page + 1 : null;
         const previous = page > 1 ? page - 1 : null;
