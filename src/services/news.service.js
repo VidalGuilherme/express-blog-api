@@ -79,7 +79,7 @@ const formatNews = (item) => {
         text: item.text,
         banner: item.banner,
         createdAt: item.createdAt,
-        comments: item.comments.map((com) => ({
+        comments: item.comments.reverse().map((com) => ({
             id: com._id,
             name: com.name,
             comment: com.comment,

@@ -11,7 +11,7 @@ const list = async (req, resp) => {
 
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;
-        const offset = off || (page-1) * limit;
+        const offset = parseInt(off) || (page-1) * limit;
 
         const news = await newsService.list(offset, limit, sort || -1, filters);
         const pagesTotal = news.total/limit;
