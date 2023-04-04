@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import conn from './src/database/db.js';
 import dotenv from 'dotenv';
 
@@ -17,6 +18,13 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(
+    cors({
+        origin: process.env.ORIGIN_CORS_ALLOW,
+        methods: ['GET', 'POST', 'PUT', 'PATCH']
+    })
+);
 
 conn();
 app.use(express.json());
