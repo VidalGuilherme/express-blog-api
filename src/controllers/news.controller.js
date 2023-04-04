@@ -3,10 +3,11 @@ import newsService, {commentNews, formatNews} from '../services/news.service.js'
 const list = async (req, resp) => {
     try{
         let {page, limit, sort, off} = req.query;
-        const {title, userId} = req.query;
+        const {title, userId, category} = req.query;
         const filterTitle = title ? { title: { $regex: `${title}`, $options: "i" } } : {};
+        const filterCategory = category ? { category: category } : {};
         const filterUser = userId ? { user: userId} : {};
-        const filters = Object.assign(filterTitle, filterUser);
+        const filters = Object.assign(filterTitle, filterCategory, filterUser);
 
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;

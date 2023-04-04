@@ -1,8 +1,40 @@
+import { Model } from 'mongoose';
 import New from '../models/New.js';
 
 const create = (body) => New.create(body);
 
 const list = (offset, limit, sort, filters) => New.find(filters).sort({_id:sort||-1}).skip(offset).limit(limit).populate('user');
+
+const listAgg = (offset, limit, sort, filters) => {
+    //const match = filters ? {$match: filters} : {};
+    const aggregate = New.aggregate([
+        {$project: { 
+            _id: 1,
+            title: 1,
+            slug: 1,
+            category: 1,
+            text: 1,
+            banner: 1,
+            createdAt: 1,
+            comments: 1,
+            user: -1,
+        }},
+        { $match: filters},
+        { $sort: {
+            _id: sort||-1
+        }},
+        { $skip: offset },
+        { $limit: limit},
+        // { $lookup: {
+        //     from: 'users',
+        //     localField: '_id',
+        //     foreignField: 'user',
+        //     as: 'user'
+        // }},
+    ]);
+
+    return aggregate.exec();
+};
 
 const find = (id) => New.findById(id).populate('user');
 
@@ -42,4 +74,4 @@ export default {
     create, list, find, findBySlug, update, remove, total, last, like, deslike, uncomment
 };
 
-export {newsComment}
+export {newsComment, listAgg}
