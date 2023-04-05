@@ -19,12 +19,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+const corsAllowed = process.env.ORIGIN_CORS_ALLOW;
+const allow = corsAllowed.split(',');
+
 app.use(
     cors({
-        origin: process.env.ORIGIN_CORS_ALLOW,
+        origin: allow,
         optionsSuccessStatus: 200,
-        methods: ['GET', 'POST', 'PUT', 'PATCH'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     })
 );
