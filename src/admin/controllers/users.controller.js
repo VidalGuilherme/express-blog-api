@@ -23,7 +23,7 @@ const list = async (req, resp) => {
 
 const find = async (req, resp) => {
     try{
-        const user = req.user;
+        const user = formatUser(req.user);
         return resp.json(user);
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -78,5 +78,16 @@ const remove = async (req, resp) => {
         return resp.status(500).json({erro: `${ex}`});
     }
 };
+
+const formatUser = (item) => {
+    return {
+        id: item._id,
+        name: item.name,
+        username: item.username,
+        email: item.email,
+        text: item.text,
+        background: item.background,
+    };
+}
 
 export default {list, find, create, update, remove};

@@ -27,7 +27,11 @@ const UserSchema = new mongoose.Schema({
     background:{
         type: String,
         required: true
-    }
+    },
+    createdAt:{
+        type: Date,
+        default: Date.now(),
+    },
 });
 
 UserSchema.pre("save", function(next){

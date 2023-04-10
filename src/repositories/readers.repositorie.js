@@ -2,13 +2,13 @@ import Reader from '../models/Reader.js';
 
 const create = (body) => Reader.create(body);
 
-const list = (offset, limit, filters) => Reader.find(filters).sort({_id:-1}).skip(offset).limit(limit);
+const list = () => Reader.find();
 
 const find = (id) => Reader.findById(id);
 
 const findByEmail = (email) => Reader.findOne({email: email});
 
-const update = (id, name, email) => Reader.findOneAndUpdate({_id:id}, {id, name, email});
+const update = (id, name, email) => Reader.findOneAndUpdate({_id:id}, {name, email});
 
 const remove = (id) => Reader.findOneAndRemove({_id:id});
 

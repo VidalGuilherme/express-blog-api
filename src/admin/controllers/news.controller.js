@@ -8,24 +8,10 @@ const list = async (req, resp) => {
         const filterUser = userId ? { user: userId} : {};
         const filters = Object.assign(filterTitle, filterUser);
 
-        const news = await newsService.list(_start, _end, filters); 
-        const data = news.data.map((item) => ({
-            id: item._id,
-            slug: item.slug,
-            category: item.category,
-            title: item.title,
-            text: item.text,
-            banner: item.banner,
-            createdAt: item.createdAt,
-            likes: item.likes,
-            comments: item.comments,
-            user: item.user ? {
-                id: item.user._id,
-                name: item.user.name,
-                usermame: item.user.username,
-                avatar: item.user.avatar,
-            } : {}
-        }));
+        const order = _order == 'ASC' ? 1 : -1;
+        const news = await newsService.list(parseInt(_start) || 0, parseInt(_end) || 15, order, filters);
+
+        const data = news.data.map((item) => formatNews(item));
 
         resp.set('Access-Control-Expose-Headers', 'X-Total-Count');
         resp.set('X-Total-Count', news.total);
@@ -37,7 +23,7 @@ const list = async (req, resp) => {
 
 const find = async (req, resp) => {
     try{
-        const news = req.news;
+        const news = formatNews(req.news);
         return resp.json(news);
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -93,5 +79,25 @@ const remove = async (req, resp) => {
         return resp.status(500).json({erro: `${ex}`});
     }
 };
+
+const formatNews = (item) => {
+    return {
+        id: item._id,
+        slug: item.slug,
+        category: item.category,
+        title: item.title,
+        text: item.text,
+        banner: item.banner,
+        createdAt: item.createdAt,
+        comments: item.comments.reverse().map((com) => ({
+            id: com._id,
+            name: com.name,
+            email: com.email,
+            comment: com.comment,
+            createdAt: com.createdAt
+        })),
+        userId: item.user._id,
+    };
+}
 
 export default {list, find, create, update, remove};

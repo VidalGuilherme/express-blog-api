@@ -18,6 +18,10 @@ const ReaderSchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
+    createdAt:{
+        type: Date,
+        default: Date.now(),
+    },
 });
 
 const Reader = mongoose.model("Reader", ReaderSchema);

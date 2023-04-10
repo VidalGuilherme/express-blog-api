@@ -1,12 +1,8 @@
 import readersRepositorie, {readerComment, readerMessage} from '../repositories/readers.repositorie.js';
 
-const list = async (offset, limit, filters) => {
-    const readers = await readersRepositorie.list(offset, limit, filters);
-    const total = await readersRepositorie.total(filters);
-    return {
-        total: total,
-        data: readers
-    };
+const list = async () => {
+    const readers = await readersRepositorie.list();
+    return readers;
 };
 
 const find = async (id) => {
