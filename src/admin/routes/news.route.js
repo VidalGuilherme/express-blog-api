@@ -9,6 +9,7 @@ router.get('/', validAuthAdmin, (req,res) => newsController.list(req, res));
 router.get('/:id', validAuthAdmin, validId, validNews, (req,res) => newsController.find(req, res));
 router.post('/', validAuthAdmin, (req, res) => newsController.create(req, res));
 router.patch('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.update(req, res));
+router.put('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.update(req, res));
 router.delete('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.remove(req, res));
 
 export default router;

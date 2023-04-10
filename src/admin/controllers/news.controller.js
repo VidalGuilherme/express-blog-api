@@ -8,7 +8,7 @@ const list = async (req, resp) => {
         const filterUser = userId ? { user: userId} : {};
         const filters = Object.assign(filterTitle, filterUser);
 
-        const order = _order == 'ASC' ? 1 : -1;
+        const order = _order == 'ASC' ? -1 : 1;
         const news = await newsService.list(parseInt(_start) || 0, parseInt(_end) || 15, order, filters);
 
         const data = news.data.map((item) => formatNews(item));
