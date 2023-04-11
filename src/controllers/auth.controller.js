@@ -24,4 +24,15 @@ const login = async (req, resp) => {
     }
 };
 
-export default {login};
+const google = async (req, resp) => {
+    try{
+        console.log(req)
+        console.log(req.body);
+        console.log(resp);
+        return resp.json({});
+    }catch(ex){
+        return resp.status(500).json({erro: `${ex}`});
+    }
+};
+
+export default {login, google};
