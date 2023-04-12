@@ -1,4 +1,4 @@
-import { uploadToGoogleDrive } from '../../services/gdrive.service.js';
+import { listFiles } from '../../services/gdrive.service.js';
 import newsService from '../../services/news.service.js';
 
 const list = async (req, resp) => {
@@ -25,6 +25,14 @@ const list = async (req, resp) => {
 const find = async (req, resp) => {
     try{
         const news = formatNews(req.news);
+
+        const files = await listFiles();
+        const items = files.data.files.map((item) => ({
+            id: item.id,
+            name: item.name,
+        }));
+        news.images = items;
+
         return resp.json(news);
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -81,20 +89,6 @@ const remove = async (req, resp) => {
     }
 };
 
-const upload = async (req, resp) => {
-    try{
-        if (!req.file) {
-            resp.status(400).send("No file uploaded.");
-            return;
-        }
-        const response = await uploadToGoogleDrive(req.file);
-
-        return resp.status(response.status).json(response.statusText);
-    }catch(ex){
-        return resp.status(500).json({erro: `${ex}`});
-    }
-};
-
 const formatNews = (item) => {
     return {
         id: item._id,
@@ -115,4 +109,4 @@ const formatNews = (item) => {
     };
 }
 
-export default {list, find, create, update, remove, upload};
+export default {list, find, create, update, remove};

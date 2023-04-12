@@ -26,9 +26,6 @@ const login = async (req, resp) => {
 
 const google = async (req, resp) => {
     try{
-        console.log(req)
-        console.log(req.body);
-        console.log(resp);
         return resp.json({});
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});

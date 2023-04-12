@@ -10,15 +10,10 @@ const getAuth = async () => {
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI,
   );
-
   auth.setCredentials({
     scope: "https://www.googleapis.com/auth/drive", 
     refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
   });
-  // const newToken = await auth.getAccessToken();
-  // auth.setCredentials({access_token: newToken});
-
-  //scopes: "https://www.googleapis.com/auth/drive",
   return auth;
 };
 
@@ -28,32 +23,59 @@ const getDriveService = async () => {
   return driveService;
 };
 
-export const uploadToGoogleDrive = async (file) => {
-    
-  console.log(file);
+const listFiles = async () => {
   const driveService = await getDriveService();
 
+  const response = await driveService.files.list({
+    pageSize: 10,
+    q: `'${process.env.GOOGLE_FOLDER_ID}' in parents and trashed=false`
+  });
+
+  return response;
+}
+
+const createFolder = async (folderName) => {
+  
+  const driveService = await getDriveService();
+  const fileMetadata = {
+    name: folderName,
+    mimeType: 'application/vnd.google-apps.folder',
+    parents: [process.env.GOOGLE_FOLDER_ID], // Change it according to your desired parent folder id
+  };
+  const response = await driveService.files.create({
+    requestBody: fileMetadata,
+    fields: "id,name",
+  });
+
+  return response;
+}
+
+const uploadImage = async (file) => {
+    
+  const driveService = await getDriveService();
   const fileMetadata = {
     name: file.originalname,
     parents: [process.env.GOOGLE_FOLDER_ID], // Change it according to your desired parent folder id
   };
-
   const media = {
     mimeType: file.mimetype,
-    //body: fs.createReadStream(file.path),
     body: bufferToStream(file.buffer),
   };
-
   const response = await driveService.files.create({
     requestBody: fileMetadata,
     media: media,
-    fields: "id",
+    fields: "id,name",
   });
-
-  //deleteFile(file.path);
-
   return response;
 };
+
+const removeFile = async (fileId) => {
+  const driveService = await getDriveService();
+
+  return await driveService.files.delete({
+    fileId: fileId
+  });
+}
 
 const bufferToStream = (buffer) => {
   const stream = new Readable();
@@ -63,8 +85,10 @@ const bufferToStream = (buffer) => {
   return stream;
 };
 
-const deleteFile = (filePath) => {
+const deleteLocalFile = (filePath) => {
   fs.unlink(filePath, () => {
     console.log("file deleted");
   });
 };
+
+export { listFiles, createFolder, uploadImage, removeFile }

@@ -2,8 +2,6 @@ import express from 'express';
 import newsController from '../controllers/news.controller.js';
 import {validId, validNews} from '../../middlewares/global.middlewares.js';
 import {validAuthAdmin} from '../middlewares/auth.middlewares.js';
-import { multer } from '../../middlewares/multer.middlewares.js';
-import { sharpImage } from '../../middlewares/sharp.middlewares.js';
 
 const router = express.Router();
 
@@ -13,7 +11,5 @@ router.post('/', validAuthAdmin, (req, res) => newsController.create(req, res));
 router.patch('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.update(req, res));
 router.put('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.update(req, res));
 router.delete('/:id', validAuthAdmin, validId, validNews, (req, res) => newsController.remove(req, res));
-
-router.post('/image/upload', validAuthAdmin, multer.single('file'), sharpImage, (req, res) => newsController.upload(req, res));
 
 export default router;
