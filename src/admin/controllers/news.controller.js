@@ -1,5 +1,6 @@
-import { listFiles } from '../../services/gdrive.service.js';
+import { listFiles, updateFileName } from '../../services/gdrive.service.js';
 import newsService from '../../services/news.service.js';
+import { formatImage } from './images.controller.js';
 
 const list = async (req, resp) => {
     try{
@@ -27,10 +28,7 @@ const find = async (req, resp) => {
         const news = formatNews(req.news);
 
         const files = await listFiles();
-        const items = files.data.files.map((item) => ({
-            id: item.id,
-            name: item.name,
-        }));
+        const items = files.data.files.map((item) => formatImage(item));
         news.images = items;
 
         return resp.json(news);
@@ -41,13 +39,14 @@ const find = async (req, resp) => {
 
 const create = async (req, resp) => {
     try{
-        const {title, text, banner, category} = req.body;
+        const {title, text, banner, category, folderName} = req.body;
 
         if(!title || !text || !banner || !category){
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
         const news = await newsService.create(title, text, banner, category, req.userId);
+        await updateFileName(folderName, news._id);
 
         if(!news){
             return resp.status(400).send({message: "Erro ao tentar criar notícia."});

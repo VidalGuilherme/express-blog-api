@@ -7,8 +7,10 @@ import { sharpImage } from '../../middlewares/sharp.middlewares.js';
 const router = express.Router();
 
 router.get('/', validAuthAdmin, (req,res) => imagesController.list(req, res));
+router.get('/:id', validAuthAdmin, (req, res) => imagesController.find(req, res));
 router.post('/', validAuthAdmin, multer.single('file'), sharpImage, (req, res) => imagesController.create(req, res));
 router.delete('/:id', validAuthAdmin, (req, res) => imagesController.remove(req, res));
 router.post('/folder', validAuthAdmin, (req, res) => imagesController.createDir(req, res));
+router.put('/folder', validAuthAdmin, (req, res) => imagesController.updateDir(req, res));
 
 export default router;

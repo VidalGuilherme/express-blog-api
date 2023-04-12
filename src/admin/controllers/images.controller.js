@@ -1,10 +1,12 @@
-import { listFiles, createFolder, uploadImage, removeFile } from '../../services/gdrive.service.js';
+import { listFiles, getFile, createFolder, updateFileName, updateFileFolder, uploadImage, removeFile } from '../../services/gdrive.service.js';
 
 const list = async (req, resp) => {
     try{
-        const files = await listFiles();
+        const {name, parent, type} = req.query;
 
-        const items = files.data.files.map((item) => format(item));
+        const files = await listFiles({name, parent}, type);
+
+        const items = files.data.files.map((item) => formatImage(item));
 
         resp.set('Access-Control-Expose-Headers', 'X-Total-Count');
         resp.set('X-Total-Count', items.length);
@@ -14,16 +16,48 @@ const list = async (req, resp) => {
     }
 };
 
+const find = async (req, resp) => {
+    try{
+        const id = req.params.id;
+        const file = await getFile(id);
+
+        const item = formatImage(file.data);
+        return resp.json(item);
+    }catch(ex){
+        return resp.status(500).json({erro: `${ex}`});
+    }
+};
+
 const create = async (req, resp) => {
     try{
+        const {folderName} = req.body;
+
         if (!req.file) {
             resp.status(400).send("No file uploaded.");
             return;
         }
-        const response = await uploadImage(req.file);
-        const item = format(response.data);
+        const response = await uploadImage(req.file, folderName);
+        const item = formatImage(response.data);
 
         return resp.status(response.status).json(item);
+
+    }catch(ex){
+        return resp.status(500).json({erro: `${ex}`});
+    }
+};
+
+const updateDir = async (req, resp) => {
+    try{
+        const {fileId, folderId} = req.body;
+
+        if (!fileId || !folderId) {
+            resp.status(400).send("No file and no Folder.");
+            return;
+        }
+
+        const response = await updateFileFolder(fileId, folderId);
+
+        return resp.status(response.status).json(response.textStatus);
 
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
@@ -39,7 +73,7 @@ const createDir = async (req, resp) => {
             return;
         }
         const response = await createFolder(dirName);
-        const item = format(response.data);
+        const item = formatImage(response.data);
 
         return resp.status(response.status).json(item);
 
@@ -62,13 +96,14 @@ const remove = async (req, resp) => {
     }
 };
 
-const format = (item) => {
+export const formatImage = (item) => {
     return {
         id: item.id,
         name: item.name,
-        //src: `https://drive.google.com/file/d/${item.id}/view`,
-        src: 'https://drive.google.com/file/d/1Lau_EOfVfgXBhM3u5vGxYCRlR5_KE2OW/view'
+        mimeType: item.mimeType,
+        type: item.mimeType.split('/').slice(0, 1)[0],
+        src: `https://drive.google.com/uc?id=${item.id}`,
     };
 }
 
-export default {list, create, createDir, remove};
+export default {list, find, create, createDir, updateDir, remove, formatImage};
