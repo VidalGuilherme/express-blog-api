@@ -1,6 +1,5 @@
-import { listFiles, updateFileName } from '../../services/gdrive.service.js';
+import { listFiles, updateFileName, formatFile, listFilesByFolderName } from '../../services/gdrive.service.js';
 import newsService from '../../services/news.service.js';
-import { formatImage } from './images.controller.js';
 
 const list = async (req, resp) => {
     try{
@@ -27,9 +26,8 @@ const find = async (req, resp) => {
     try{
         const news = formatNews(req.news);
 
-        const files = await listFiles();
-        const items = files.data.files.map((item) => formatImage(item));
-        news.images = items;
+        const files = await listFilesByFolderName(news.id);
+        news.images = files;
 
         return resp.json(news);
     }catch(ex){

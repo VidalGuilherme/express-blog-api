@@ -24,4 +24,10 @@ const multer = Multer({
     fileFilter: filter,
 });
 
+// const createFileName = (file) => {    
+//     //const type = file.originalname.split('.').slice(-1);
+//     return file.fieldname + "_" + Date.now() + ".webp";
+//     //return file.fieldname + "_" + Date.now() + "" + type;
+// };
+
 export {multer};

@@ -23,19 +23,58 @@ const getDriveService = async () => {
   return driveService;
 };
 
+const formatFile = (item) => {
+  return {
+      id: item.id,
+      name: item.name,
+      mimeType: item.mimeType,
+      type: item.mimeType.split('/').slice(0, 1)[0],
+      src: `https://drive.google.com/uc?id=${item.id}`,
+  };
+}
+
 const listFiles = async (filters, type='image') => {
   const driveService = await getDriveService();
 
-  const queryParents = filters && filters.parent ? ` and '${filters.parent}' in parents ` : `and '${process.env.GOOGLE_FOLDER_ID}' in parents `;
-  const queryName = filters && filters.name ? ` and name='${filters.name}' ` : '';  
-  const queryType = type == 'image' ? " and mimeType='image/webp' " : " and mimeType='application/vnd.google-apps.folder' ";
+  let query = 'trashed=false';
+  if(filters){
+    if(filters.parent){
+      query += ` and '${filters.parent}' in parents `
+    }
 
+    if(filters.name){
+      query += ` and name='${filters.name}' `;
+    }
+
+    if(type == 'image'){
+      query += " and mimeType='image/webp' ";
+      if(!filters.parent){
+        query += " and name contains 'tabgames_img_' ";
+      }
+    }else{
+      query += " and mimeType='application/vnd.google-apps.folder' ";
+    }
+  }
+  
   const response = await driveService.files.list({
     pageSize: 10,
-    q: `trashed=false ${queryType} ${queryParents} ${queryName}`
+    q: query
   });
 
-  return response;
+   const files = response.data.files.map((item) => formatFile(item));
+
+   return files;
+}
+
+const listFilesByFolderName = async (folderName) => {
+
+  const folders = await listFiles({name: folderName}, 'folder');
+  if(folders.length > 0){
+    const files = listFiles({parent: folders[0].id});
+    return files;
+  }
+
+  return [];
 }
 
 const getFile = async (id) => {
@@ -45,7 +84,7 @@ const getFile = async (id) => {
     fileId: id,
   });
 
-  return response;
+  return formatFile(response.dta);
 }
 
 const createFolder = async (folderName, parent = null) => {
@@ -61,7 +100,7 @@ const createFolder = async (folderName, parent = null) => {
     fields: "id,name,mimeType",
   });
 
-  return response;
+  return formatFile(response.data);
 }
 
 const updateFileFolder = async (fileId, folderId) => {
@@ -77,16 +116,19 @@ const updateFileFolder = async (fileId, folderId) => {
 
 const updateFileName = async (from, to, type='folder') => {
   
-  const find = await listFiles({name:from}, type);
-  const id = find.data[0].id;
+  const find = await listFiles({name:from}, type);  
+  if(find.length > 0){
+    const id = find[0].id;
+    const driveService = await getDriveService();
+    const response = await driveService.files.update({
+      fileId: id,
+      name: to
+    });
   
-  const driveService = await getDriveService();
-  const response = await driveService.files.update({
-    fileId: id,
-    name: to
-  });
+    return response;
+  }
 
-  return response;
+  return await createFolder(to);
 }
 
 const uploadImage = async (file, folderName = null) => {
@@ -94,11 +136,11 @@ const uploadImage = async (file, folderName = null) => {
   let parentFolder = process.env.GOOGLE_DRAFTS_ID;
   if(folderName){
     const findDir = await listFiles({name:folderName}, 'folder');
-    if(findDir.data.lenght > 0){
-      parentFolder = findDir.data[0].id;
+    if(findDir.length > 0){
+      parentFolder = findDir[0].id;
     }else{
       const respDir = await createFolder(folderName);
-      parentFolder = respDir.data.id;
+      parentFolder = respDir.id;
     }
   }
 
@@ -126,7 +168,7 @@ const uploadImage = async (file, folderName = null) => {
     }
   });
 
-  return response;
+  return formatFile(response.data);
 };
 
 const removeFile = async (fileId) => {
@@ -151,4 +193,4 @@ const deleteLocalFile = (filePath) => {
   });
 };
 
-export { listFiles, getFile, createFolder, updateFileName, updateFileFolder, uploadImage, removeFile }
+export { formatFile, listFiles, listFilesByFolderName, getFile, createFolder, updateFileName, updateFileFolder, uploadImage, removeFile }

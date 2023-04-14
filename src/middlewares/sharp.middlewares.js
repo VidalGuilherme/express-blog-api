@@ -12,7 +12,7 @@ const sharpImage = async (req, resp, next) => {
             .webp(
                 //{lossless: true}
             )
-            .resize(800, 600)
+            .resize(1024, 720)
             .toBuffer();
             //.toFile(path);
 
@@ -28,7 +28,7 @@ const sharpImage = async (req, resp, next) => {
 
 const createFileName = (file) => {    
     //const type = file.originalname.split('.').slice(-1);
-    return file.fieldname + "_" + Date.now() + ".webp";
+    return "tabgames_img_" + Date.now() + ".webp";
     //return file.fieldname + "_" + Date.now() + "" + type;
 };
 
