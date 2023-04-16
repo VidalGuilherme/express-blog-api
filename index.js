@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import conn from './src/database/db.js';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 
 import swaggerRoute from './src/routes/swagger.route.cjs';
@@ -33,6 +34,7 @@ app.use(
 
 conn();
 app.use(express.json());
+app.use(helmet());
 
 app.use('/api-docs', swaggerRoute);
 
