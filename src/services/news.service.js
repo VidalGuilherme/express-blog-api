@@ -22,17 +22,19 @@ const findBySlug = async (category, slug) => {
     return news;
 };
 
-const create = async (title, text, banner, category, userId) => {
+const create = async (title, text, banner, category, tags, userId) => {
     const slug = stringToSlug(title);
+    category = category.toLowerCase();
     const news = await newsRepositorie.create({
-        title, slug, text, banner, category, user:{_id:userId}
+        title, slug, text, banner, category, tags, user:{_id:userId}
     });
     return news;
 };
 
-const update = async (id, title, text, banner, category) => {
+const update = async (id, title, text, banner, category, tags, createdAt) => {
     const slug = title ? stringToSlug(title) : undefined;
-    await newsRepositorie.update(id, {title, slug, text, banner, category});
+    category = category.toLowerCase();
+    await newsRepositorie.update(id, {title, slug, text, banner, category, tags, createdAt});
     return true;
 };
 
@@ -79,6 +81,7 @@ const formatNews = (item) => {
         text: item.text,
         banner: item.banner,
         createdAt: item.createdAt,
+        tags: item.tags,
         comments: item.comments.reverse().map((com) => ({
             id: com._id,
             name: com.name,

@@ -30,6 +30,10 @@ const NewSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    tags:{
+        type: Array,
+        required: true,
+    },
     likes:{
         type: Array,
         required: true,

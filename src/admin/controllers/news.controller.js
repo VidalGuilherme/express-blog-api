@@ -37,13 +37,13 @@ const find = async (req, resp) => {
 
 const create = async (req, resp) => {
     try{
-        const {title, text, banner, category, folderName} = req.body;
+        const {title, text, banner, category, folderName, tags} = req.body;
 
-        if(!title || !text || !banner || !category){
+        if(!title || !text || !banner || !category || !tags){
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create(title, text, banner, category, req.userId);
+        const news = await newsService.create(title, text, banner, category, tags, req.userId);
         await updateFileName(folderName, news._id);
 
         if(!news){
@@ -51,7 +51,8 @@ const create = async (req, resp) => {
         }
 
         return resp.status(201).send({
-            news: {id: news._id, title},
+            id: news._id, 
+            title,
             message: "Notícia criada com sucesso!"
         });
     }catch(ex){
@@ -61,16 +62,20 @@ const create = async (req, resp) => {
 
 const update = async (req, resp) => {
     try{
-        const {title, text, banner, category} = req.body;
+        const {title, text, banner, category, tags, createdAt} = req.body;
 
-        if(!title && !text && !banner && !category){
+        if(!title && !text && !banner && !category && !tags && !createdAt){
             return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
         }
 
         const {id, news} = req;
-        await newsService.update(id, title, text, banner, category);
+        await newsService.update(id, title, text, banner, category, tags, createdAt);
 
-        return resp.status(200).send({message: "Notícia atualizada com sucesso!"});
+        return resp.status(200).send({
+            id: news._id, 
+            title,
+            message: "Notícia atualizada com sucesso!"
+        });
     }catch(ex){
         return resp.status(500).json({erro: `${ex}`});
     }
@@ -95,6 +100,7 @@ const formatNews = (item) => {
         text: item.text,
         banner: item.banner,
         createdAt: item.createdAt,
+        tags: item.tags,
         comments: item.comments.reverse().map((com) => ({
             id: com._id,
             name: com.name,

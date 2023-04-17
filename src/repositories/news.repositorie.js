@@ -16,6 +16,7 @@ const listAgg = (offset, limit, sort, filters) => {
             text: 1,
             banner: 1,
             createdAt: 1,
+            tags: 1,
             comments: 1,
             user: -1,
         }},
