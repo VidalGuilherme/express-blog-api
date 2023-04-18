@@ -116,7 +116,7 @@ const updateFileFolder = async (fileId, folderId) => {
 
 const updateFileName = async (from, to, type='folder') => {
   
-  const find = await listFiles({name:from}, type);  
+  const find = await listFiles({name:from}, type);
   if(find.length > 0){
     const id = find[0].id;
     const driveService = await getDriveService();

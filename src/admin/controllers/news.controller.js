@@ -1,4 +1,4 @@
-import { listFiles, updateFileName, formatFile, listFilesByFolderName } from '../../services/gdrive.service.js';
+import { updateFileName, listFilesByFolderName } from '../../services/gdrive.service.js';
 import newsService from '../../services/news.service.js';
 
 const list = async (req, resp) => {
@@ -10,7 +10,8 @@ const list = async (req, resp) => {
         const filters = Object.assign(filterTitle, filterUser);
 
         const order = _order == 'ASC' ? -1 : 1;
-        const news = await newsService.list(parseInt(_start) || 0, parseInt(_end) || 15, order, filters);
+        const sorter = {createdAt: order};
+        const news = await newsService.list(parseInt(_start) || 0, parseInt(_end) || 15, sorter, filters);
 
         const data = news.data.map((item) => formatNews(item));
 
@@ -37,13 +38,13 @@ const find = async (req, resp) => {
 
 const create = async (req, resp) => {
     try{
-        const {title, text, banner, category, folderName, tags} = req.body;
+        const {title, text, banner, category, folderName, tags, draft} = req.body;
 
         if(!title || !text || !banner || !category || !tags){
             return resp.status(400).send({message: "Preencha todos os campos para o registro."});
         }
 
-        const news = await newsService.create(title, text, banner, category, tags, req.userId);
+        const news = await newsService.create(title, text, banner, category, tags, draft, req.userId);
         await updateFileName(folderName, news._id);
 
         if(!news){
@@ -62,14 +63,14 @@ const create = async (req, resp) => {
 
 const update = async (req, resp) => {
     try{
-        const {title, text, banner, category, tags, createdAt} = req.body;
+        const {title, text, banner, category, tags, createdAt, draft} = req.body;
 
         if(!title && !text && !banner && !category && !tags && !createdAt){
             return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
         }
 
         const {id, news} = req;
-        await newsService.update(id, title, text, banner, category, tags, createdAt);
+        await newsService.update(id, title, text, banner, category, tags, createdAt, draft);
 
         return resp.status(200).send({
             id: news._id, 
@@ -96,6 +97,7 @@ const formatNews = (item) => {
         id: item._id,
         slug: item.slug,
         category: item.category,
+        draft: item.draft,
         title: item.title,
         text: item.text,
         banner: item.banner,

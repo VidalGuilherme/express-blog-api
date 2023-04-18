@@ -3,7 +3,7 @@ import New from '../models/New.js';
 
 const create = (body) => New.create(body);
 
-const list = (offset, limit, sort, filters) => New.find(filters).sort({_id:sort||-1}).skip(offset).limit(limit).populate('user');
+const list = (offset, limit, sort, filters) => New.find(filters).sort(sort).skip(offset).limit(limit).populate('user');
 
 const listAgg = (offset, limit, sort, filters) => {
     //const match = filters ? {$match: filters} : {};
@@ -11,6 +11,7 @@ const listAgg = (offset, limit, sort, filters) => {
         {$project: { 
             _id: 1,
             title: 1,
+            draft: 1,
             slug: 1,
             category: 1,
             text: 1,
@@ -21,9 +22,7 @@ const listAgg = (offset, limit, sort, filters) => {
             user: -1,
         }},
         { $match: filters},
-        { $sort: {
-            _id: sort||-1
-        }},
+        { $sort: sort},
         { $skip: offset },
         { $limit: limit},
         // { $lookup: {

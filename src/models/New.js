@@ -9,6 +9,10 @@ const NewSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    draft:{
+        type: Boolean,
+        required: true,
+    },
     category:{
         type: String,
         required: true,
