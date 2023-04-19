@@ -7,7 +7,14 @@ const list = async (req, resp) => {
         const filterTitle = title ? { title: { $regex: `${title}`, $options: "i" } } : {};
         const filterCategory = category ? { category: category } : {};
         const filterUser = userId ? { user: userId} : {};
-        const filters = Object.assign({draft: false}, filterTitle, filterCategory, filterUser);
+
+        const filters = Object.assign(
+            {draft: false}, 
+            { createdAt: { $lte: new Date() } },
+            filterTitle, 
+            filterCategory, 
+            filterUser
+        );
 
         page = page ? Number(page) : 1;
         limit = limit ? Number(limit) : 5;
