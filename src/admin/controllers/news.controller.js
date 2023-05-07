@@ -63,14 +63,14 @@ const create = async (req, resp) => {
 
 const update = async (req, resp) => {
     try{
-        const {title, text, banner, category, tags, createdAt, draft} = req.body;
+        const {title, text, banner, category, tags, createdAt, draft, comments} = req.body;
 
         if(!title && !text && !banner && !category && !tags && !createdAt){
             return resp.status(400).send({message: "Preencha pelo menos um campo para o atualizar."});
         }
 
         const {id, news} = req;
-        await newsService.update(id, title, text, banner, category, tags, createdAt, draft);
+        await newsService.update(id, title, text, banner, category, tags, createdAt, draft, comments);
 
         return resp.status(200).send({
             id: news._id, 
@@ -103,6 +103,7 @@ const formatNews = (item) => {
         banner: item.banner,
         createdAt: item.createdAt,
         tags: item.tags,
+        commentsCount: item.comments.length,
         comments: item.comments.reverse().map((com) => ({
             id: com._id,
             name: com.name,

@@ -25,6 +25,7 @@ const list = async (req, resp) => {
         const pagesTotal = news.total/limit;
         const next = page < pagesTotal ? page + 1 : null;
         const previous = page > 1 ? page - 1 : null;
+        const last = Math.ceil(pagesTotal);
         
         const list = {
             pagination: {
@@ -32,6 +33,7 @@ const list = async (req, resp) => {
                 currentPage: page,            
                 next,
                 previous,
+                last,
             },
             news: news.data.map((item) => formatNews(item))
         };

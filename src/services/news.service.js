@@ -31,10 +31,10 @@ const create = async (title, text, banner, category, tags, draft, userId) => {
     return news;
 };
 
-const update = async (id, title, text, banner, category, tags, createdAt, draft) => {
+const update = async (id, title, text, banner, category, tags, createdAt, draft, comments) => {
     const slug = title ? stringToSlug(title) : undefined;
     category = category.toLowerCase();
-    await newsRepositorie.update(id, {title, slug, text, banner, category, tags, createdAt, draft});
+    await newsRepositorie.update(id, {title, slug, text, banner, category, tags, createdAt, draft, comments});
     return true;
 };
 
